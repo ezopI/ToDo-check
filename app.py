@@ -1,11 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+import os
+from flask import Flask, render_template, request, redirect, url_for, jsonify, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from models import Base, engine, SessionLocal, Todo, User
 
 app = Flask(__name__)
-app.secret_key = ""
+app.secret_key = os.environ.get("SECRET_KEY", "dev_secret_key")
 
 login_manager = LoginManager()
 login_manager.login_view = "login"
@@ -15,9 +16,10 @@ def init_db():
     Base.metadata.create_all(bind=engine)
 
 class LoginUser(UserMixin):
-    def __init__(self, db_user):
+    def __init__(self, db_user: User):
         self.id = db_user.id
         self.email = db_user.email
+        self.username = db_user.username
 
 @login_manager.user_loader
 def load_user(user_id: str):
@@ -31,10 +33,11 @@ def load_user(user_id: str):
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        email = resquest.form.get("email", "").strip().lower()
-        password = request.form.get("password", "")
+        username = request.form.get("username", "").strip().lower()
+        email = request.form.get("email", "").strip().lower()
+        password_hash = request.form.get("password", "")
 
-        if not email or not password:
+        if not username or not email or not password_hash:
             flash("Fill email and password.")
             return redirect(url_for("register"))
         
@@ -45,14 +48,14 @@ def register():
             flash("Email already registered.")
             return redirect(url_for("register"))
         
-        u = User (email=email, password=generate_password_hash(password))
+        u = User(email=email, password_hash=generate_password_hash(password_hash))
         db.add(u)
         db.commit()
-        user_id = u.id
-        db.close()
+        db.refresh(u)  # Para obter o ID gerado
 
         # login automático após registro
-        login_user(LoginUser(User(id=user_id, email=email, password_hash="")), remember=True)
+        login_user(LoginUser(u), remember=True)
+        db.close()
         return redirect(url_for("index"))
     
     return render_template("register.html")
