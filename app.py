@@ -14,17 +14,13 @@ login_manager.init_app(app)
 
 def init_db():
     Base.metadata.create_all(bind=engine)
+init_db()
 
 class LoginUser(UserMixin):
     def __init__(self, db_user: User):
         self.id = db_user.id
         self.email = db_user.email
         self.username = db_user.username
-
-def init_db():
-    Base.metadata.create_all(bind=engine)
-
-init_db()
 
 @login_manager.user_loader
 def load_user(user_id: str):
