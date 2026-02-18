@@ -3,8 +3,9 @@ from sqlalchemy import create_engine, Boolean, Integer, String, ForeignKey
 from sqlalchemy.orm import sessionmaker, DeclarativeBase, Mapped, mapped_column, relationship
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///local.db")
-print("DATABASE_URL =", DATABASE_URL)
 
+if DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql://", 1)
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
