@@ -12,6 +12,9 @@ login_manager = LoginManager()
 login_manager.login_view = "login"
 login_manager.init_app(app)
 
+# def ensure_tables():
+#     Base.metadata.create_all(bind=engine)
+
 def init_db():
     Base.metadata.create_all(bind=engine)
 init_db()
@@ -49,7 +52,7 @@ def register():
             flash("Email already registered.")
             return redirect(url_for("register"))
         
-        u = User(email=email, password_hash=generate_password_hash(password_hash))
+        u = User(username=username, email=email, password_hash=generate_password_hash(password_hash))
         db.add(u)
         db.commit()
         db.refresh(u)  # Para obter o ID gerado
