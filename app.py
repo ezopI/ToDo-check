@@ -21,6 +21,11 @@ class LoginUser(UserMixin):
         self.email = db_user.email
         self.username = db_user.username
 
+def init_db():
+    Base.metadata.create_all(bind=engine)
+
+init_db()
+
 @login_manager.user_loader
 def load_user(user_id: str):
     db = SessionLocal()
@@ -141,5 +146,4 @@ def delete(todo_id):
     return redirect(url_for("index"))
 
 if __name__ == '__main__':
-    init_db()
     app.run()
