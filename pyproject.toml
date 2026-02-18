@@ -1,0 +1,13 @@
+[project]
+name = "todo"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "flask>=3.1.2",
+    "flask-login>=0.6.3",
+    "gunicorn>=25.1.0",
+    "psycopg[binary]>=3.3.2",
+    "sqlalchemy>=2.0.46",
+]
